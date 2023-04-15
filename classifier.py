@@ -115,6 +115,11 @@ class ClassifierCommittee:
 
     @staticmethod
     def getModeArray(classifiers):
+        """
+
+        :param classifiers: an array of classifiers from type simpleClassifiers
+        :return: the prediction as if it was deciding based on majority desicion
+        """
         n_arrays = len(classifiers)
         array_length = len(classifiers[0].yPrediction)
         combined_array = np.zeros(array_length)
@@ -143,7 +148,7 @@ class ClassifierCommittee:
         precision = (len(yPrediction) - wrong) / len(yPrediction)
         return precision * 100
 
-    def getBestAccuracyClassifiers(committeeSize):
+    def getBestAccuracyClassifiers(self,committeeSize):
         classifiers = self.classifiers
         sorted_classifiers = sorted(classifiers, key=lambda x: x.evaluationPrecision, reverse=True)
         return sorted_classifiers[:committeeSize]
