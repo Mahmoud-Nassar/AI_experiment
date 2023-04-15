@@ -1,16 +1,17 @@
 import pandas as pd
+
 pd.options.mode.chained_assignment = None  # default='warn'
 import random
 import numpy as np
+import heapq
 from sklearn.impute import SimpleImputer
 from collections import Counter
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split, KFold
 
-K = 30
+K = 5
 FOLDS_NUMBER = 5
-COMMITTEE_MEMBERS_NUMBER = 21
-
+COMMITTEE_MEMBERS_NUMBER = 3
 
 
 class SimpleClassifier:
@@ -71,6 +72,7 @@ class ClassifierCommittee:
         majorityApproachPrecision = 0
         random21ApproachPrecision = 0
         bestPrecision21Precision = 0
+        distanceBasedPrecsison = 0
         for trainIndexes, testIndexes in self.folds:
             XTrain = self.X.iloc[trainIndexes]
             yTrain = self.y.iloc[trainIndexes]
@@ -108,10 +110,43 @@ class ClassifierCommittee:
             bestPrecision21Prediction = ClassifierCommittee.getModeArray(bestPrecision21Classifiers)
             bestPrecision21Precision += ClassifierCommittee.getPrecision(bestPrecision21Prediction, yTest)
 
+            distanceBasedPrecsison += self.getDistanceBasedPrecsison(XTest, yTest)
 
         majorityApproachPrecision /= FOLDS_NUMBER
         random21ApproachPrecision /= FOLDS_NUMBER
         bestPrecision21Precision /= FOLDS_NUMBER
+        distanceBasedPrecsison /= FOLDS_NUMBER
+
+        return majorityApproachPrecision,random21ApproachPrecision,\
+            bestPrecision21Precision,distanceBasedPrecsison
+
+    def getDistanceBasedPrecsison(self, XTest, yTest):
+        right = 0
+        i = 0
+        for index, example in XTest.iterrows():
+            distances = []
+            for classifier in self.classifiers:
+                distanceFromExample = \
+                    ClassifierCommittee.distanceFromSet(classifier.XTrain, example)
+                distances.append([classifier, distanceFromExample])
+            distanceBest21Tuples = heapq.nsmallest(COMMITTEE_MEMBERS_NUMBER, distances,
+                                                   key=lambda x: x[1])
+
+            distanceBest21Classifiers = [node[0] for node in distanceBest21Tuples]
+            distanceBest21Prediction = ClassifierCommittee.getModeArray(distanceBest21Classifiers)
+            prediction = distanceBest21Prediction[i]
+            realValue = yTest.iloc[index][0]
+            right += 1 if prediction == realValue else 0
+            i += 1
+        return right/len(yTest)
+
+    @staticmethod
+    def distanceFromSet(XTrainSet, testExample):
+        distance = 0
+        for index, trainExample in XTrainSet.iterrows():
+            distance += np.sqrt(((trainExample - testExample) ** 2).sum())
+        distance /= len(XTrainSet)
+        return distance
 
     @staticmethod
     def getModeArray(classifiers):
@@ -148,8 +183,7 @@ class ClassifierCommittee:
         precision = (len(yPrediction) - wrong) / len(yPrediction)
         return precision * 100
 
-    def getBestAccuracyClassifiers(self,committeeSize):
+    def getBestAccuracyClassifiers(self, committeeSize):
         classifiers = self.classifiers
         sorted_classifiers = sorted(classifiers, key=lambda x: x.evaluationPrecision, reverse=True)
         return sorted_classifiers[:committeeSize]
-

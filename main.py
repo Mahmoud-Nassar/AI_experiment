@@ -16,4 +16,9 @@ CLASSIFICATION_FIELD = ['Potability']
 if __name__ == '__main__':
 
     classifier = CC(CSV_READ_PATH,ATTRIBUTES,CLASSIFICATION_FIELD)
-    classifier.experiment()
+    result = classifier.experiment()
+    print(("Precision majority approach = {} ," 
+          "Precision random choosing approach = {} ,"
+          " Precision best trainig Precision approach = {} ,"
+          " Precision of distance approache = {} ").
+          format(result[0],result[1],result[2],result[3]))
