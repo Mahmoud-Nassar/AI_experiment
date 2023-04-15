@@ -1,5 +1,4 @@
 import pandas as pd
-
 pd.options.mode.chained_assignment = None  # default='warn'
 import random
 import numpy as np
@@ -10,6 +9,8 @@ from sklearn.model_selection import train_test_split, KFold
 
 K = 30
 FOLDS_NUMBER = 5
+COMMITTEE_MEMBERS_NUMBER = 21
+
 
 
 class SimpleClassifier:
@@ -20,6 +21,7 @@ class SimpleClassifier:
         self.XEvaluation = XEvaluation
         self.yEvaluation = yEvaluation
         self.yPrediction = None
+        self.evaluationPrecision = None
 
     def fit(self):
         self.classifier.fit(self.XTrain, self.yTrain)
@@ -29,6 +31,9 @@ class SimpleClassifier:
             XEvaluation = self.XEvaluation
         self.yPrediction = self.classifier.predict(XEvaluation)
         self.yPrediction = self.yPrediction.reshape(-1, 1)
+
+    def saveEvaluationPrecision(self):
+        self.evaluationPrecision = self.getPrecision()
 
     def getPrecision(self):
         i = 0
@@ -65,6 +70,7 @@ class ClassifierCommittee:
     def experiment(self):
         majorityApproachPrecision = 0
         random21ApproachPrecision = 0
+        bestPrecision21Precision = 0
         for trainIndexes, testIndexes in self.folds:
             XTrain = self.X.iloc[trainIndexes]
             yTrain = self.y.iloc[trainIndexes]
@@ -82,7 +88,7 @@ class ClassifierCommittee:
                                               , XInnerEvaluation, yInnerEvaluation)
                 classifier.fit()
                 classifier.predict()
-                classifier.getPrecision()
+                classifier.saveEvaluationPrecision()
                 self.classifiers.append(classifier)
 
             XTest = self.X.iloc[testIndexes]
@@ -94,13 +100,18 @@ class ClassifierCommittee:
             majorityPrediction = ClassifierCommittee.getModeArray(self.classifiers)
             majorityApproachPrecision += ClassifierCommittee.getPrecision(majorityPrediction, yTest)
 
-            random21Classifiers = np.array(random.sample(self.classifiers, 21))
+            random21Classifiers = np.array(random.sample(self.classifiers, COMMITTEE_MEMBERS_NUMBER))
             random21Prediction = ClassifierCommittee.getModeArray(random21Classifiers)
             random21ApproachPrecision += ClassifierCommittee.getPrecision(random21Prediction, yTest)
 
+            bestPrecision21Classifiers = self.getBestAccuracyClassifiers(COMMITTEE_MEMBERS_NUMBER)
+            bestPrecision21Prediction = ClassifierCommittee.getModeArray(bestPrecision21Classifiers)
+            bestPrecision21Precision += ClassifierCommittee.getPrecision(bestPrecision21Prediction, yTest)
 
-        majorityApproachPrecision /=FOLDS_NUMBER
-        random21ApproachPrecision /=FOLDS_NUMBER
+
+        majorityApproachPrecision /= FOLDS_NUMBER
+        random21ApproachPrecision /= FOLDS_NUMBER
+        bestPrecision21Precision /= FOLDS_NUMBER
 
     @staticmethod
     def getModeArray(classifiers):
@@ -131,3 +142,9 @@ class ClassifierCommittee:
             i += 1
         precision = (len(yPrediction) - wrong) / len(yPrediction)
         return precision * 100
+
+    def getBestAccuracyClassifiers(committeeSize):
+        classifiers = self.classifiers
+        sorted_classifiers = sorted(classifiers, key=lambda x: x.evaluationPrecision, reverse=True)
+        return sorted_classifiers[:committeeSize]
+
