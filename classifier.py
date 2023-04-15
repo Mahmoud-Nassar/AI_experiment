@@ -102,22 +102,6 @@ class ClassifierCommittee:
         majorityApproachPrecision /=FOLDS_NUMBER
         random21ApproachPrecision /=FOLDS_NUMBER
 
-
-
-    # """
-    # this function recives an array of classifers and returns a
-    # prediction array which represents the prediction of the majority
-    # of the classifers supllied in the array self.classifiers
-    # """
-    # def getModeArray(self):
-    #     classifiers = self.classifiers
-    #     n = len(classifiers[0].yPrediction)
-    #     result = np.zeros(n, dtype=int)
-    #     for i in range(n):
-    #         values = [c.yPrediction[i] for c in classifiers]
-    #         value_counts = np.bincount(values)
-    #         result[i] = np.argmax(value_counts)
-    #     return result
     @staticmethod
     def getModeArray(classifiers):
         n_arrays = len(classifiers)
@@ -136,20 +120,6 @@ class ClassifierCommittee:
             most_common_value = max(value_counts, key=value_counts.get)
             combined_array[i] = most_common_value
         return combined_array
-
-    #
-    # def getModeArray(self):
-    #     classifiers = self.classifiers
-    #     all_predictions = [classifier.yPrediction for classifier in classifiers]
-    #     result = np.empty(len(all_predictions[0]), dtype=int)
-    #     for i in range(len(result)):
-    #         values = [pred[i] for pred in all_predictions if i < len(pred)]
-    #         if len(values) > 0:
-    #             counter = Counter(values)
-    #             result[i] = counter.most_common(1)[0][0]
-    #         else:
-    #             result[i] = np.nan
-    #     return result
 
     @staticmethod
     def getPrecision(yPrediction, yEvaluation):
