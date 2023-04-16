@@ -49,14 +49,13 @@ class SimpleClassifier:
 
 class ClassifierCommittee:
     def __init__(self, csvDataReadPath, attributes, classificationField):
+        # df = pd.read_csv(csvDataReadPath,nrows = 1500)
         df = pd.read_csv(csvDataReadPath)
         self.X = df[attributes]
         self.y = df[classificationField]
-
         # Fill missing values with the mean of each column
         for column in self.X.columns:
             self.X.loc[self.X[column].isnull(), column] = self.X[column].mean()
-
         # # delete the lines with missing values
         # self.X.dropna(subset=self.X.columns, inplace=True)
         # self.y = self.y[self.X.index]
@@ -65,7 +64,6 @@ class ClassifierCommittee:
         self.folds = []
         for trainIndexes, testIndexes in self.kf.split(self.X):
             self.folds.append((trainIndexes, testIndexes))
-
         self.classifiers = []
 
     def experiment(self):
@@ -135,10 +133,10 @@ class ClassifierCommittee:
             distanceBest21Classifiers = [node[0] for node in distanceBest21Tuples]
             distanceBest21Prediction = ClassifierCommittee.getModeArray(distanceBest21Classifiers)
             prediction = distanceBest21Prediction[i]
-            realValue = yTest.iloc[index][0]
+            realValue = yTest.loc[index][0]
             right += 1 if prediction == realValue else 0
             i += 1
-        return right/len(yTest)
+        return (right/len(yTest)*100)
 
     @staticmethod
     def distanceFromSet(XTrainSet, testExample):
