@@ -1,5 +1,15 @@
+water_potability : 
+Precision majority approach = 100.0% 
+Precision random choosing approach = 100.0% 
+Precision best training Precision approach = 100.0% 
+Precision of distance approach = 100.0% 
+voice_gender_Recognition : 
+Precision majority approach = 100.0% 
+Precision random choosing approach = 100.0% 
+Precision best training Precision approach = 100.0% 
+Precision of distance approach = 100.0% 
 heart_attack : 
 Precision majority approach = 94.5% 
-Precision random choosing approach = 93.5% 
-Precision best training Precision approach = 93.0% 
-Precision of distance approach = 95.0% 
+Precision random choosing approach = 93.0% 
+Precision best training Precision approach = 94.5% 
+Precision of distance approach = 93.0% 
