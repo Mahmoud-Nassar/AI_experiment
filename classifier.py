@@ -9,9 +9,9 @@ from collections import Counter
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split, KFold
 
-K = 5
+K = 101
 FOLDS_NUMBER = 5
-COMMITTEE_MEMBERS_NUMBER = 3
+COMMITTEE_MEMBERS_NUMBER = 21
 
 
 class SimpleClassifier:
@@ -49,8 +49,8 @@ class SimpleClassifier:
 
 class ClassifierCommittee:
     def __init__(self, csvDataReadPath, attributes, classificationField):
-        df = pd.read_csv(csvDataReadPath, nrows=200)
-        # df = pd.read_csv(csvDataReadPath)
+        # df = pd.read_csv(csvDataReadPath, nrows=200)
+        df = pd.read_csv(csvDataReadPath)
         self.X = df[attributes]
         self.y = df[classificationField]
         # Fill missing values with the mean of each column
