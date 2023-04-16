@@ -49,8 +49,8 @@ class SimpleClassifier:
 
 class ClassifierCommittee:
     def __init__(self, csvDataReadPath, attributes, classificationField):
-        # df = pd.read_csv(csvDataReadPath,nrows = 1500)
-        df = pd.read_csv(csvDataReadPath)
+        df = pd.read_csv(csvDataReadPath, nrows=200)
+        # df = pd.read_csv(csvDataReadPath)
         self.X = df[attributes]
         self.y = df[classificationField]
         # Fill missing values with the mean of each column
@@ -115,8 +115,8 @@ class ClassifierCommittee:
         bestPrecision21Precision /= FOLDS_NUMBER
         distanceBasedPrecsison /= FOLDS_NUMBER
 
-        return majorityApproachPrecision,random21ApproachPrecision,\
-            bestPrecision21Precision,distanceBasedPrecsison
+        return majorityApproachPrecision, random21ApproachPrecision, \
+            bestPrecision21Precision, distanceBasedPrecsison
 
     def getDistanceBasedPrecsison(self, XTest, yTest):
         right = 0
@@ -136,7 +136,7 @@ class ClassifierCommittee:
             realValue = yTest.loc[index][0]
             right += 1 if prediction == realValue else 0
             i += 1
-        return (right/len(yTest)*100)
+        return (right / len(yTest) * 100)
 
     @staticmethod
     def distanceFromSet(XTrainSet, testExample):

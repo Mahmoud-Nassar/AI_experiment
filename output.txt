@@ -1,0 +1,5 @@
+heart_attack : 
+Precision majority approach = 94.5% 
+Precision random choosing approach = 93.5% 
+Precision best training Precision approach = 93.0% 
+Precision of distance approach = 95.0% 
