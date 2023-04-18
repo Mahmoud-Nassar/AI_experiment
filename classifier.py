@@ -1,11 +1,8 @@
 import pandas as pd
-
 pd.options.mode.chained_assignment = None  # default='warn'
 import random
 import numpy as np
 import heapq
-from sklearn.impute import SimpleImputer
-from collections import Counter
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split, KFold
 
@@ -49,7 +46,6 @@ class SimpleClassifier:
 
 class ClassifierCommittee:
     def __init__(self, csvDataReadPath, attributes, classificationField):
-        # df = pd.read_csv(csvDataReadPath, nrows=200)
         df = pd.read_csv(csvDataReadPath)
         self.X = df[attributes]
         self.y = df[classificationField]
@@ -68,13 +64,10 @@ class ClassifierCommittee:
 
     def experiment(self):
         majorityApproachPrecision = 0
-        random21ApproachPrecision = 0
-        bestPrecision21Precision = 0
-        distanceBasedPrecsison = 0
+        randomCommitteeApproachPrecision = 0
+        bestPrecisionCommitteePrecision = 0
+        distanceBasedCommitteePrecision = 0
         for trainIndexes, testIndexes in self.folds:
-            XTrain = self.X.iloc[trainIndexes]
-            yTrain = self.y.iloc[trainIndexes]
-
             for i in range(0, K):
                 innerTrainIndexes, innerEvaluationIndexes = \
                     train_test_split(trainIndexes, test_size=0.33)
@@ -100,25 +93,25 @@ class ClassifierCommittee:
             majorityPrediction = ClassifierCommittee.getModeArray(self.classifiers)
             majorityApproachPrecision += ClassifierCommittee.getPrecision(majorityPrediction, yTest)
 
-            random21Classifiers = np.array(random.sample(self.classifiers, COMMITTEE_MEMBERS_NUMBER))
-            random21Prediction = ClassifierCommittee.getModeArray(random21Classifiers)
-            random21ApproachPrecision += ClassifierCommittee.getPrecision(random21Prediction, yTest)
+            randomCommitteeClassifiers = np.array(random.sample(self.classifiers, COMMITTEE_MEMBERS_NUMBER))
+            randomCommitteePrediction = ClassifierCommittee.getModeArray(randomCommitteeClassifiers)
+            randomCommitteeApproachPrecision += ClassifierCommittee.getPrecision(randomCommitteePrediction, yTest)
 
-            bestPrecision21Classifiers = self.getBestAccuracyClassifiers(COMMITTEE_MEMBERS_NUMBER)
-            bestPrecision21Prediction = ClassifierCommittee.getModeArray(bestPrecision21Classifiers)
-            bestPrecision21Precision += ClassifierCommittee.getPrecision(bestPrecision21Prediction, yTest)
+            bestPrecisionCommitteeClassifiers = self.getBestAccuracyClassifiers(COMMITTEE_MEMBERS_NUMBER)
+            bestPrecisionCommitteePrediction = ClassifierCommittee.getModeArray(bestPrecisionCommitteeClassifiers)
+            bestPrecisionCommitteePrecision += ClassifierCommittee.getPrecision(bestPrecisionCommitteePrediction, yTest)
 
-            distanceBasedPrecsison += self.getDistanceBasedPrecsison(XTest, yTest)
+            distanceBasedCommitteePrecision += self.getDistanceBasedPrecision(XTest, yTest)
 
         majorityApproachPrecision /= FOLDS_NUMBER
-        random21ApproachPrecision /= FOLDS_NUMBER
-        bestPrecision21Precision /= FOLDS_NUMBER
-        distanceBasedPrecsison /= FOLDS_NUMBER
+        randomCommitteeApproachPrecision /= FOLDS_NUMBER
+        bestPrecisionCommitteePrecision /= FOLDS_NUMBER
+        distanceBasedCommitteePrecision /= FOLDS_NUMBER
 
-        return majorityApproachPrecision, random21ApproachPrecision, \
-            bestPrecision21Precision, distanceBasedPrecsison
+        return majorityApproachPrecision, randomCommitteeApproachPrecision, \
+            bestPrecisionCommitteePrecision, distanceBasedCommitteePrecision
 
-    def getDistanceBasedPrecsison(self, XTest, yTest):
+    def getDistanceBasedPrecision(self, XTest, yTest):
         right = 0
         i = 0
         for index, example in XTest.iterrows():
