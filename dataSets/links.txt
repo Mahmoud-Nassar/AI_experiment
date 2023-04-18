@@ -1,3 +1,0 @@
-Heart Attack Analysis & Prediction Dataset : https://www.kaggle.com/datasets/rashikrahmanpritom/heart-attack-analysis-prediction-dataset
-Water Quality : https://www.kaggle.com/datasets/adityakadiwal/water-potability
-voice gender Recognition : https://www.kaggle.com/datasets/primaryobjects/voicegender -> (male is  0, female is 1 )
